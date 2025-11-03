@@ -52,10 +52,6 @@ const App: React.FC = () => {
                         <div className="text-center md:text-left">
                             <h1 className="text-4xl md:text-5xl font-bold text-stone-900 tracking-tight">{CONTACT_INFO.name}</h1>
                             <div className="mt-4 flex flex-wrap justify-center md:justify-start items-center gap-x-6 gap-y-2 text-stone-500">
-                        <a href={`tel:${CONTACT_INFO.phone.replace(/\s/g, '')}`} className="flex items-center hover:text-emerald-600 transition-colors">
-                            <Icon name="phone" />
-                            <span>{CONTACT_INFO.phone}</span>
-                        </a>
                         <a href={`mailto:${CONTACT_INFO.email}`} className="flex items-center hover:text-emerald-600 transition-colors">
                             <Icon name="email" />
                             <span>{CONTACT_INFO.email}</span>

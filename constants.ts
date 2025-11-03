@@ -4,7 +4,6 @@ import type { TimelineItemProps } from './types';
 
 export const CONTACT_INFO = {
     name: "Colin HONG",
-    phone: "+65 8505 3577",
     email: "HONG0259@e.ntu.edu.sg",
     githubUrl: "https://github.com/googlercolin",
     websiteUrl: "https://googlercolin.github.io"
