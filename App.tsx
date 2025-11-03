@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Section } from './components/Section';
 import { TimelineItem } from './components/TimelineItem';
 import { SkillBadge } from './components/SkillBadge';
@@ -17,12 +17,41 @@ import {
 import type { TimelineItemProps } from './types';
 
 const App: React.FC = () => {
+    // Small inline component for profile image with fallback logic
+    const ProfileImage: React.FC = () => {
+        const candidates = ['/profile.png', '/profile.jpg'];
+        const [index, setIndex] = useState(0);
+        const [visible, setVisible] = useState(true);
+
+        const handleError = () => {
+            if (index < candidates.length - 1) {
+                setIndex((i) => i + 1);
+            } else {
+                // exhausted candidates
+                setVisible(false);
+            }
+        };
+
+        if (!visible) return null;
+
+        return (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+                src={candidates[index]}
+                alt="Profile"
+                className="w-24 h-24 rounded-full object-cover shadow-lg"
+                onError={handleError}
+            />
+        );
+    };
     return (
         <div className="min-h-screen bg-stone-100 font-sans text-stone-700">
             <main className="container mx-auto max-w-4xl px-6 py-12 md:py-20">
-                <header className="mb-16 text-center md:text-left">
-                    <h1 className="text-4xl md:text-5xl font-bold text-stone-900 tracking-tight">{CONTACT_INFO.name}</h1>
-                    <div className="mt-4 flex flex-wrap justify-center md:justify-start items-center gap-x-6 gap-y-2 text-stone-500">
+                <header className="mb-16">
+                    <div className="flex items-start justify-center md:justify-between">
+                        <div className="text-center md:text-left">
+                            <h1 className="text-4xl md:text-5xl font-bold text-stone-900 tracking-tight">{CONTACT_INFO.name}</h1>
+                            <div className="mt-4 flex flex-wrap justify-center md:justify-start items-center gap-x-6 gap-y-2 text-stone-500">
                         <a href={`tel:${CONTACT_INFO.phone.replace(/\s/g, '')}`} className="flex items-center hover:text-emerald-600 transition-colors">
                             <Icon name="phone" />
                             <span>{CONTACT_INFO.phone}</span>
@@ -35,10 +64,21 @@ const App: React.FC = () => {
                            <Icon name="github" />
                             <span>GitHub</span>
                         </a>
-                         <a href={CONTACT_INFO.websiteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center hover:text-emerald-600 transition-colors">
-                           <Icon name="website" />
-                            <span>Website</span>
-                        </a>
+                        {CONTACT_INFO.websiteUrl && (
+                            <a href={CONTACT_INFO.websiteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center hover:text-emerald-600 transition-colors">
+                               <Icon name="website" />
+                                <span>Website</span>
+                            </a>
+                        )}
+                            </div>
+                        </div>
+
+                        {/* Profile photo (place a file at /profile.png or /profile.jpg in the repo root or public folder)
+                            We prefer PNG but fallback to JPG if PNG missing. The onError handler advances through candidates. */}
+                        <div className="hidden md:flex items-center ml-6">
+                            {/** client-side fallback between /profile.png and /profile.jpg **/}
+                            <ProfileImage />
+                        </div>
                     </div>
                 </header>
 
@@ -47,7 +87,6 @@ const App: React.FC = () => {
                 </Section>
                 
                 <Section title="Education">
-                    {/* FIX: Use `title`, `subtitle`, and `description` props to match TimelineItemProps */}
                     {EDUCATION.map((edu, index) => (
                          <TimelineItem
                             key={index}
@@ -60,7 +99,6 @@ const App: React.FC = () => {
                 </Section>
 
                 <Section title="Research Experience">
-                    {/* FIX: Use `title` and `subtitle` props to match TimelineItemProps */}
                     {RESEARCH_EXPERIENCE.map((exp, index) => (
                         <TimelineItem
                             key={index}
@@ -73,7 +111,6 @@ const App: React.FC = () => {
                 </Section>
 
                 <Section title="Selected Projects & Industry Experience">
-                    {/* FIX: Use `title` and `subtitle` props to match TimelineItemProps */}
                     {PROJECTS_EXPERIENCE.map((proj, index) => (
                         <TimelineItem
                             key={index}
@@ -86,7 +123,6 @@ const App: React.FC = () => {
                 </Section>
 
                 <Section title="Leadership & Co-Curricular Activities">
-                    {/* FIX: Use `title` and `subtitle` props to match TimelineItemProps */}
                     {LEADERSHIP_ACTIVITIES.map((activity, index) => (
                          <TimelineItem
                             key={index}

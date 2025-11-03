@@ -1,17 +1,17 @@
 
+import React from 'react';
 import type { TimelineItemProps } from './types';
 
 export const CONTACT_INFO = {
     name: "Colin HONG",
     phone: "+65 8505 3577",
     email: "HONG0259@e.ntu.edu.sg",
-    githubUrl: "https://github.com/hyscale-lab/slimsc",
-    websiteUrl: "https://hyscale-lab.github.io/slimsc/" // Example, can be updated
+    githubUrl: "https://github.com/googlercolin",
+    websiteUrl: "https://googlercolin.github.io"
 };
 
 export const PROFESSIONAL_SUMMARY: string = "Computer Science PhD Candidate at Nanyang Technological University with a research focus on efficient LLM reasoning at the systems level. Published first-author research at EMNLP 2025 (Oral Presentation). Proven ability to lead and deliver innovative projects from inception to completion, demonstrated by co-founding Admitflow, an AI-powered admissions platform that achieved a 60x increase in processing speed. Strong background in LLM serving, quantum computing and cryptography, and high-performance systems.";
 
-// FIX: Changed properties to match TimelineItemProps: degree -> title, institution -> subtitle, details -> description
 export const EDUCATION: TimelineItemProps[] = [
     {
         title: "Doctor of Philosophy (PhD) in Computer Science",
@@ -31,14 +31,18 @@ export const EDUCATION: TimelineItemProps[] = [
     }
 ];
 
-// FIX: Changed properties to match TimelineItemProps: role -> title, organization -> subtitle
 export const RESEARCH_EXPERIENCE: TimelineItemProps[] = [
     {
         title: "Research Associate, HyScale Lab",
         subtitle: "NTU Singapore",
         duration: "Feb 2025 - Aug 2025",
         description: [
-            "Spearheaded the research and development of Slim-SC (https://github.com/hyscale-lab/slimsc), a novel thought-pruning algorithm that reduces the computational cost of Self-Consistency in LLMs, accepted at EMNLP 2025.",
+            /* Use a React node so the repo URL is rendered as an accessible link */
+            React.createElement(React.Fragment, null,
+                "Spearheaded the research and development of ",
+                React.createElement('a', { href: 'https://github.com/hyscale-lab/slimsc', target: '_blank', rel: 'noopener noreferrer', className: 'text-emerald-600 hover:underline' }, 'Slim-SC'),
+                ", a novel thought-pruning algorithm that reduces the computational cost of Self-Consistency in LLMs, accepted at EMNLP 2025."
+            ),
             "Engineered a system using semantic similarity to proactively terminate redundant reasoning chains, achieving up to 45% lower latency and 25% less memory usage during inference.",
             "Validated the method across multiple reasoning benchmarks, demonstrating robust accuracy comparable to or exceeding brute-force scaling methods."
         ]
@@ -56,7 +60,6 @@ export const RESEARCH_EXPERIENCE: TimelineItemProps[] = [
     }
 ];
 
-// FIX: Changed properties to match TimelineItemProps: role -> title, organization -> subtitle
 export const PROJECTS_EXPERIENCE: TimelineItemProps[] = [
     {
         title: "1st Runner-Up, SCDF-Dell Lifesavers' Innovation Challenge 2025 (Project AuraGuard)",
@@ -107,7 +110,6 @@ export const PROJECTS_EXPERIENCE: TimelineItemProps[] = [
     }
 ];
 
-// FIX: Changed properties to match TimelineItemProps: role -> title, organization -> subtitle
 export const LEADERSHIP_ACTIVITIES: TimelineItemProps[] = [
     {
         title: "Residential Mentor, Hall of Residence 2",
