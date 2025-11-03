@@ -1,0 +1,44 @@
+name: Build and publish to docs
+
+on:
+  push:
+    branches: [ main ]
+    # Ignore changes to docs and the workflow itself to avoid infinite loops
+    paths-ignore:
+      - 'docs/**'
+      - 'dist/**'
+      - '.github/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Copy build to docs
+        run: |
+          rm -rf docs
+          mv dist docs
+
+      - name: Commit and push docs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          git commit -m "chore: publish site to docs [skip ci]" || echo "No changes to commit"
+          git push origin HEAD:main
