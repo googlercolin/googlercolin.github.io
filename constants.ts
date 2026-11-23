@@ -12,7 +12,7 @@ export const HERO = {
     eyebrow: 'phd candidate · ntu singapore',
     headline: 'Building the systems that serve LLMs and agents.',
     summary:
-        'I am a Computer Science PhD candidate at NTU building systems for LLM and agent serving, working with NLP researchers in academia (Xu Guo, NLP Postdoc, NTU) and systems researchers in industry (Esha Choukse, Azure Systems Research, Microsoft). My background is in LLM inference, KV-cache management, serverless systems, and cloud-native infrastructure.',
+        'I am a Computer Science PhD candidate at NTU building systems for LLM and agent serving, working with systems researchers in industry (Esha Choukse, Azure Systems Research, Microsoft) and NLP researchers in academia (Xu Guo, NLP Postdoc, NTU). My background is in LLM inference, KV-cache management, serverless systems, and cloud-native infrastructure.',
 };
 
 export const STATS: Stat[] = [
@@ -67,7 +67,7 @@ export const RESEARCH: Entry[] = [
                     'Spearheaded the research and development of Slim-SC, a thought-pruning algorithm that reduces the computational cost of Self-Consistency test-time scaling in LLMs.',
                     'Engineered similarity-based pruning that terminates redundant reasoning chains at the thought level, reducing inference latency by up to 45% and KV-cache usage by up to 26%.',
                     'Validated across three STEM reasoning benchmarks and two LLM architectures, matching or exceeding the accuracy of brute-force Self-Consistency.',
-                    'First-author paper accepted for Oral Presentation at EMNLP 2025; awarded Best Oral Presentation at the Second Singapore–China Joint Symposium on AI & Sustainability.',
+                    'First-author paper accepted to the EMNLP 2025 Main Conference as an Oral Presentation; awarded Best Oral Presentation at the Second Singapore–China Joint Symposium on AI & Sustainability.',
                 ],
             },
         ],
