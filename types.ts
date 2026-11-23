@@ -1,10 +1,31 @@
+export interface EntryGroup {
+    heading: string;
+    bullets: string[];
+}
 
-import type { ReactNode } from 'react';
-
-export interface TimelineItemProps {
+export interface Entry {
+    period: string;
+    /** Small uppercase label under the date, e.g. a place or a category. */
+    tag?: string;
+    /** Shows a live indicator beside the date. */
+    current?: boolean;
     title: string;
-    subtitle: string;
-    duration: string;
-    // Allow React nodes so we can include links or formatted content in list items
-    description: ReactNode[];
+    org?: string;
+    summary?: string;
+    bullets?: string[];
+    groups?: EntryGroup[];
+}
+
+export interface Publication {
+    title: string;
+    authors: string[];
+    venue: string;
+    year: string;
+    note?: string;
+    links: { label: string; href: string }[];
+}
+
+export interface Stat {
+    value: string;
+    label: string;
 }

@@ -1,162 +1,301 @@
-
-import React, { useState } from 'react';
-import { Section } from './components/Section';
-import { TimelineItem } from './components/TimelineItem';
-import { SkillBadge } from './components/SkillBadge';
-import { Icon } from './components/Icon';
-import { 
-    CONTACT_INFO, 
-    PROFESSIONAL_SUMMARY,
-    EDUCATION,
-    RESEARCH_EXPERIENCE,
-    PROJECTS_EXPERIENCE,
-    LEADERSHIP_ACTIVITIES,
-    SKILLS,
-    HOBBIES
+import React, { useEffect, useState } from 'react';
+import {
+    CONTACT_INFO, HERO, STATS, PUBLICATIONS, RESEARCH, PROJECTS,
+    EDUCATION, TEACHING, LEADERSHIP, SKILLS, HOBBIES,
 } from './constants';
-import type { TimelineItemProps } from './types';
+import type { Entry, Publication } from './types';
 
-const App: React.FC = () => {
-    // Small inline component for profile image with fallback logic
-    const ProfileImage: React.FC = () => {
-        const candidates = ['/profile.png', '/profile.jpg'];
-        const [index, setIndex] = useState(0);
-        const [visible, setVisible] = useState(true);
+const NAV = [
+    { id: 'research', label: 'Research' },
+    { id: 'publications', label: 'Publications' },
+    { id: 'projects', label: 'Projects' },
+    { id: 'about', label: 'About' },
+];
 
-        const handleError = () => {
-            if (index < candidates.length - 1) {
-                setIndex((i) => i + 1);
-            } else {
-                // exhausted candidates
-                setVisible(false);
-            }
-        };
+const pad = (n: number) => String(n).padStart(2, '0');
 
-        if (!visible) return null;
+const Wordmark: React.FC = () => (
+    <a className="wordmark" href="#top" aria-label="Back to top">
+        colin<span className="accent">.</span>hong
+    </a>
+);
 
-        return (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-                src={candidates[index]}
-                alt="Profile"
-                className="w-24 h-24 rounded-full object-cover shadow-lg"
-                onError={handleError}
-            />
-        );
+const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <span className="eyebrow"><span className="eyebrow-rule" aria-hidden="true" />{children}</span>
+);
+
+const Bullets: React.FC<{ items: string[] }> = ({ items }) => (
+    <ul className="bullets">
+        {items.map((b, i) => (
+            <li key={i}><span className="dash" aria-hidden="true" />{b}</li>
+        ))}
+    </ul>
+);
+
+const EntryRow: React.FC<{ entry: Entry }> = ({ entry }) => (
+    <article className="row reveal">
+        <div className="row-meta">
+            <div className="row-period">
+                {entry.current && <span className="live" aria-hidden="true"><span /></span>}
+                {entry.period}
+            </div>
+            {entry.tag && <div className="row-tag">{entry.tag}</div>}
+        </div>
+        <div>
+            <h3 className="row-title">
+                {entry.title}
+                {entry.org && <span className="row-org"> · {entry.org}</span>}
+            </h3>
+            {entry.summary && <p className="row-summary">{entry.summary}</p>}
+            {entry.bullets && <Bullets items={entry.bullets} />}
+            {entry.groups?.map((g) => (
+                <div className="group" key={g.heading}>
+                    <h4 className="group-heading">{g.heading}</h4>
+                    <Bullets items={g.bullets} />
+                </div>
+            ))}
+        </div>
+    </article>
+);
+
+const PublicationRow: React.FC<{ pub: Publication }> = ({ pub }) => (
+    <article className="row reveal">
+        <div className="row-meta">
+            <div className="row-period">{pub.venue}</div>
+            <div className="row-tag">{pub.year}</div>
+            {pub.note && <div className="row-tag accent">{pub.note}</div>}
+        </div>
+        <div>
+            <h3 className="row-title">{pub.title}</h3>
+            <p className="authors">
+                {pub.authors.map((a, i) => (
+                    <React.Fragment key={a}>
+                        {i > 0 && ', '}
+                        {a === CONTACT_INFO.name ? <strong>{a}</strong> : a}
+                    </React.Fragment>
+                ))}
+            </p>
+            <div className="pub-links">
+                {pub.links.map((l) => (
+                    <a key={l.href} className="text-link" href={l.href} target="_blank" rel="noopener noreferrer">
+                        {l.label} <span aria-hidden="true">↗</span>
+                    </a>
+                ))}
+            </div>
+        </div>
+    </article>
+);
+
+const SectionHead: React.FC<{ id: string; eyebrow: string; title: string; lede?: string }> = ({ id, eyebrow, title, lede }) => (
+    <div className="section-head reveal">
+        <Eyebrow>{eyebrow}</Eyebrow>
+        <h2 id={`${id}-title`}>{title}</h2>
+        {lede && <p className="lede">{lede}</p>}
+    </div>
+);
+
+const SubHead: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <div className="subhead reveal"><Eyebrow>{children}</Eyebrow></div>
+);
+
+const ThemeToggle: React.FC = () => {
+    const [theme, setTheme] = useState<string>(() => document.documentElement.dataset.theme || 'dark');
+    const toggle = () => {
+        const next = theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try { localStorage.setItem('theme', next); } catch { /* storage unavailable */ }
+        setTheme(next);
     };
     return (
-        <div className="min-h-screen bg-stone-100 font-sans text-stone-700">
-            <main className="container mx-auto max-w-4xl px-6 py-12 md:py-20">
-                <header className="mb-16">
-                    <div className="flex items-start justify-center md:justify-between">
-                        <div className="text-center md:text-left">
-                            <h1 className="text-4xl md:text-5xl font-bold text-stone-900 tracking-tight">{CONTACT_INFO.name}</h1>
-                            <div className="mt-4 flex flex-wrap justify-center md:justify-start items-center gap-x-6 gap-y-2 text-stone-500">
-                        <a href={`mailto:${CONTACT_INFO.email}`} className="flex items-center hover:text-emerald-600 transition-colors">
-                            <Icon name="email" />
-                            <span>{CONTACT_INFO.email}</span>
-                        </a>
-                        <a href={CONTACT_INFO.githubUrl} target="_blank" rel="noopener noreferrer" className="flex items-center hover:text-emerald-600 transition-colors">
-                           <Icon name="github" />
-                            <span>GitHub</span>
-                        </a>
-                        {CONTACT_INFO.websiteUrl && (
-                            <a href={CONTACT_INFO.websiteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center hover:text-emerald-600 transition-colors">
-                               <Icon name="website" />
-                                <span>Website</span>
+        <button type="button" className="theme-toggle" onClick={toggle} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}>
+            {theme === 'dark' ? 'Light' : 'Dark'}
+        </button>
+    );
+};
+
+const App: React.FC = () => {
+    const [active, setActive] = useState<string>('');
+    const [scrolled, setScrolled] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [showPhoto, setShowPhoto] = useState(true);
+
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > 8);
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+
+    // Highlight the nav item for the section currently in view.
+    useEffect(() => {
+        const sections = NAV.map((n) => document.getElementById(n.id)).filter(Boolean) as HTMLElement[];
+        const io = new IntersectionObserver(
+            (entries) => entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id); }),
+            { rootMargin: '-35% 0px -60% 0px' },
+        );
+        sections.forEach((s) => io.observe(s));
+        return () => io.disconnect();
+    }, []);
+
+    // Fade content in as it enters the viewport.
+    useEffect(() => {
+        const els = Array.from(document.querySelectorAll<HTMLElement>('.reveal'));
+        if (!('IntersectionObserver' in window)) {
+            els.forEach((el) => el.classList.add('in'));
+            return;
+        }
+        const io = new IntersectionObserver(
+            (entries) => entries.forEach((e) => {
+                if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+            }),
+            { rootMargin: '0px 0px -8% 0px' },
+        );
+        els.forEach((el) => io.observe(el));
+        return () => io.disconnect();
+    }, []);
+
+    return (
+        <>
+            <a href="#main" className="skip-link">Skip to content</a>
+
+            <header className={`site-header${scrolled || menuOpen ? ' is-scrolled' : ''}`}>
+                <nav className="wrap nav" aria-label="Primary">
+                    <Wordmark />
+                    <div className="nav-links">
+                        {NAV.map((n, i) => (
+                            <a key={n.id} href={`#${n.id}`} className={`nav-link${active === n.id ? ' is-active' : ''}`}
+                                aria-current={active === n.id ? 'true' : undefined}>
+                                <span className="nav-num">{pad(i + 1)}</span>{n.label}
                             </a>
-                        )}
-                            </div>
-                        </div>
-
-                        {/* Profile photo (place a file at /profile.png or /profile.jpg in the repo root or public folder)
-                            We prefer PNG but fallback to JPG if PNG missing. The onError handler advances through candidates. */}
-                        <div className="hidden md:flex items-center ml-6">
-                            {/** client-side fallback between /profile.png and /profile.jpg **/}
-                            <ProfileImage />
-                        </div>
-                    </div>
-                </header>
-
-                <Section title="Professional Summary">
-                    <p className="text-stone-600 leading-relaxed">{PROFESSIONAL_SUMMARY}</p>
-                </Section>
-                
-                <Section title="Education">
-                    {EDUCATION.map((edu, index) => (
-                         <TimelineItem
-                            key={index}
-                            title={edu.title}
-                            subtitle={edu.subtitle}
-                            duration={edu.duration}
-                            description={edu.description}
-                        />
-                    ))}
-                </Section>
-
-                <Section title="Research Experience">
-                    {RESEARCH_EXPERIENCE.map((exp, index) => (
-                        <TimelineItem
-                            key={index}
-                            title={exp.title}
-                            subtitle={exp.subtitle}
-                            duration={exp.duration}
-                            description={exp.description}
-                        />
-                    ))}
-                </Section>
-
-                <Section title="Selected Projects & Industry Experience">
-                    {PROJECTS_EXPERIENCE.map((proj, index) => (
-                        <TimelineItem
-                            key={index}
-                            title={proj.title}
-                            subtitle={proj.subtitle}
-                            duration={proj.duration}
-                            description={proj.description}
-                        />
-                    ))}
-                </Section>
-
-                <Section title="Leadership & Co-Curricular Activities">
-                    {LEADERSHIP_ACTIVITIES.map((activity, index) => (
-                         <TimelineItem
-                            key={index}
-                            title={activity.title}
-                            subtitle={activity.subtitle}
-                            duration={activity.duration}
-                            description={activity.description}
-                        />
-                    ))}
-                </Section>
-
-                <Section title="Skills">
-                    {Object.entries(SKILLS).map(([category, skills]) => (
-                        <div key={category} className="mb-4">
-                            <h3 className="font-semibold text-stone-800 mb-2">{category}</h3>
-                            <div className="flex flex-wrap gap-2">
-                                {skills.map((skill, index) => (
-                                    <SkillBadge key={index} skill={skill} />
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </Section>
-
-                <Section title="Hobbies & Interests">
-                    <div className="flex flex-wrap gap-2">
-                         {HOBBIES.map((hobby, index) => (
-                             <SkillBadge key={index} skill={hobby} />
                         ))}
                     </div>
-                </Section>
+                    <div className="nav-actions">
+                        <ThemeToggle />
+                        <a className="btn nav-cta" href={`mailto:${CONTACT_INFO.email}`}>Get in touch</a>
+                        <button type="button" className={`menu-btn${menuOpen ? ' is-open' : ''}`} aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                            aria-expanded={menuOpen} aria-controls="mobile-menu" onClick={() => setMenuOpen((o) => !o)}>
+                            <span /><span /><span />
+                        </button>
+                    </div>
+                </nav>
+                <div id="mobile-menu" className={`mobile-menu${menuOpen ? ' is-open' : ''}`}>
+                    <div>
+                        <div className="mobile-menu-inner">
+                            {NAV.map((n, i) => (
+                                <a key={n.id} href={`#${n.id}`} onClick={() => setMenuOpen(false)} tabIndex={menuOpen ? 0 : -1}>
+                                    <span className="nav-num">{pad(i + 1)}</span>{n.label}
+                                </a>
+                            ))}
+                            <a className="btn" href={`mailto:${CONTACT_INFO.email}`} tabIndex={menuOpen ? 0 : -1}>Get in touch</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
 
-                <footer className="text-center mt-20 text-stone-500 text-sm">
-                    <p>Built with React, TypeScript, and Tailwind CSS.</p>
-                    <p>&copy; {new Date().getFullYear()} Colin Hong. All Rights Reserved.</p>
-                </footer>
+            <main id="main" tabIndex={-1}>
+                <section id="top" className="wrap hero">
+                    <div className="hero-text">
+                        <Eyebrow>{HERO.eyebrow}</Eyebrow>
+                        <h1>{HERO.headline}</h1>
+                        <p className="hero-summary">{HERO.summary}</p>
+                        <div className="hero-actions">
+                            <a className="btn btn-solid" href="#publications">Read the papers</a>
+                            <a className="btn" href={CONTACT_INFO.githubUrl} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+                        </div>
+                    </div>
+                    {showPhoto && (
+                        <img className="hero-photo" src="/profile.png" alt="Portrait of Colin Hong" width={176} height={176}
+                            onError={() => setShowPhoto(false)} />
+                    )}
+                </section>
+
+                <div className="wrap">
+                    <dl className="stats">
+                        {STATS.map((s) => (
+                            <div key={s.label} className="stat">
+                                <dt>{s.label}</dt>
+                                <dd>{s.value}</dd>
+                            </div>
+                        ))}
+                    </dl>
+                </div>
+
+                <section id="research" className="wrap section" aria-labelledby="research-title">
+                    <SectionHead id="research" eyebrow="research" title="Making agent serving faster and cheaper."
+                        lede="Runtime KV-cache and context management for high-throughput, energy-efficient LLM agent serving." />
+                    <div className="rows">{RESEARCH.map((e) => <EntryRow key={e.title + e.period} entry={e} />)}</div>
+                </section>
+
+                <section id="publications" className="wrap section" aria-labelledby="publications-title">
+                    <SectionHead id="publications" eyebrow="publications" title="Papers." />
+                    <div className="rows">{PUBLICATIONS.map((p) => <PublicationRow key={p.title} pub={p} />)}</div>
+                </section>
+
+                <section id="projects" className="wrap section" aria-labelledby="projects-title">
+                    <SectionHead id="projects" eyebrow="selected projects & industry" title="Things built outside the lab." />
+                    <div className="rows">{PROJECTS.map((e) => <EntryRow key={e.title + e.period} entry={e} />)}</div>
+                </section>
+
+                <section id="about" className="wrap section" aria-labelledby="about-title">
+                    <SectionHead id="about" eyebrow="about" title="Education, teaching, and everything else." />
+
+                    <SubHead>education</SubHead>
+                    <div className="rows">{EDUCATION.map((e) => <EntryRow key={e.title} entry={e} />)}</div>
+
+                    <SubHead>teaching</SubHead>
+                    <div className="rows">{TEACHING.map((e) => <EntryRow key={e.title} entry={e} />)}</div>
+
+                    <SubHead>leadership & community</SubHead>
+                    <div className="rows">{LEADERSHIP.map((e) => <EntryRow key={e.org} entry={e} />)}</div>
+
+                    <div className="split">
+                        <div className="reveal">
+                            <Eyebrow>skills</Eyebrow>
+                            <dl className="skills">
+                                {SKILLS.map((s) => (
+                                    <div key={s.label}>
+                                        <dt>{s.label}</dt>
+                                        <dd>{s.items.join(' · ')}</dd>
+                                    </div>
+                                ))}
+                            </dl>
+                        </div>
+                        <div className="reveal">
+                            <Eyebrow>off the clock</Eyebrow>
+                            <ul className="chips">
+                                {HOBBIES.map((h) => <li key={h}>{h}</li>)}
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="wrap closing reveal">
+                    <h2>Working on LLM or agent serving?</h2>
+                    <p>I am always glad to compare notes on inference systems, KV-cache management, and efficient AI.</p>
+                    <a className="btn btn-solid" href={`mailto:${CONTACT_INFO.email}`}>Get in touch</a>
+                </section>
             </main>
-        </div>
+
+            <footer className="site-footer">
+                <div className="wrap footer-top">
+                    <div>
+                        <Wordmark />
+                        <p>{CONTACT_INFO.role}, {CONTACT_INFO.location}</p>
+                    </div>
+                    <nav aria-label="Footer" className="footer-links">
+                        {NAV.map((n) => <a key={n.id} href={`#${n.id}`}>{n.label}</a>)}
+                    </nav>
+                    <div className="footer-links">
+                        <a href={CONTACT_INFO.githubUrl} target="_blank" rel="noopener noreferrer">GitHub</a>
+                        <a href={`mailto:${CONTACT_INFO.email}`}>Email</a>
+                    </div>
+                </div>
+                <div className="wrap footer-bottom">
+                    <span>© {new Date().getFullYear()} Colin Hong</span>
+                    <span>Built with React and TypeScript.</span>
+                </div>
+            </footer>
+        </>
     );
 };
 
